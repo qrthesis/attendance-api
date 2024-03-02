@@ -41,7 +41,7 @@ app.get('/', (req, res)=>{
     res.send("Welcome to root URL of Server"); 
 });
 
-app.get('/login', async(req, res)=>{
+app.post('/login', async(req, res)=>{
     try {
         await mongoClientRun();
         
