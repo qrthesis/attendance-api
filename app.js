@@ -79,6 +79,13 @@ app.post('/create-event', async(req, res) => {
 
         const { eventName, description, date} = req.body
 
+        if (eventName === '' || description === '' || date === null) {
+            return res.status(500).json({            
+                message: "Server Error ",
+            });
+        }
+
+
         const result = await table.insertOne({
             name: eventName,
             description,
