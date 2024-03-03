@@ -85,7 +85,6 @@ app.post('/create-event', async(req, res) => {
             });
         }
 
-
         const result = await table.insertOne({
             name: eventName,
             description,
