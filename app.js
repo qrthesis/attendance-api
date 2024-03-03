@@ -77,10 +77,10 @@ app.post('/create-event', async(req, res) => {
         const db = client.db("ThesisData")
         const table = db.collection('Events')
 
-        const { name, description, date} = req.body
+        const { eventName, description, date} = req.body
 
         const result = await table.insertOne({
-            name,
+            name: eventName,
             description,
             date
         })
