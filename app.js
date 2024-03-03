@@ -25,16 +25,6 @@ const mongoClientRun = async () => {
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    // try {
-    //     // Connect the client to the server	(optional starting in v4.7)
-    //     await client.connect();
-    //     // Send a ping to confirm a successful connection
-    //     await client.db("admin").command({ ping: 1 });
-    //     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    // } finally {
-    //     // Ensures that the client will close when you finish/error
-    //     await client.close();
-    // }
 }
 
 
@@ -46,9 +36,6 @@ app.get('/', (req, res)=>{
 app.post('/login', async(req, res)=>{
     try {
         await mongoClientRun();
-        
-        // const email = "qrthesisattendance@gmail.com"
-        // const password = "QWRtaW5QYXNzd29yZA=="
 
         const db = client.db("ThesisData")
         const table = db.collection('UsersTable')
@@ -81,6 +68,43 @@ app.post('/login', async(req, res)=>{
         });
     }
 });
+
+app.post('/create-event', async(req, res) => {
+    try {
+
+        await mongoClientRun();
+
+        const db = client.db("ThesisData")
+        const table = db.collection('Events')
+
+        const { name, description, date} = req.body
+
+        const result = await table.insertOne({
+            name,
+            description,
+            date
+        })
+
+        if (!result) {
+            return res.status(500).json({            
+                message: "Server Error ",
+            });
+        }
+
+        // Return success if email and password matches
+        await client.close();
+        return res.status(200).json({
+            message: "Event successfully created",
+        })
+    } catch(error) {
+        console.log("error: ", error)
+        //Return error if can't connect db
+        await client.close();
+        return res.status(500).json({            
+            message: "Server Error ",
+        });
+    }
+})
 
 app.listen(PORT, (error) =>{ 
     if(!error) 
