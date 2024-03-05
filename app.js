@@ -112,6 +112,31 @@ app.post('/create-event', async(req, res) => {
     }
 })
 
+app.get('/get-events', async(req, res) => {
+    try {
+
+        await mongoClientRun();
+
+        const db = client.db("ThesisData")
+        const table = db.collection('Events')
+
+        const data = await table.find().toArray();
+        await client.close();
+
+        return res.status(200).json({
+            message: "Events successfully fetched",
+            data: JSON.stringify(data)
+        })
+    } catch(error) {
+        console.log("error: ", error)
+        //Return error if can't connect db
+        await client.close();
+        return res.status(500).json({            
+            message: "Server Error ",
+        });
+    }
+})
+
 app.listen(PORT, (error) =>{ 
     if(!error) 
         console.log("Server is Successfully Running, and App is listening on port "+ PORT) 
