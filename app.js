@@ -122,7 +122,7 @@ app.get("/get-events", async (req, res) => {
 
     return res.status(200).json({
       message: "Events successfully fetched",
-      data: JSON.stringify(data),
+      data,
     });
   } catch (error) {
     console.log("error: ", error);
