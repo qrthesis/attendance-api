@@ -174,9 +174,9 @@ app.post("/create-student", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
-    const { email, password, name, role } = req.body;
+    const { email, password, name } = req.body;
 
-    if (email === "" || password === "" || name === "" || role === "") {
+    if (email === "" || password === "" || name === "") {
       return res.status(500).json({
         message: "Server Error ",
       });
@@ -186,7 +186,52 @@ app.post("/create-student", async (req, res) => {
       email,
       password,
       name,
-      role,
+      role: "student",
+      _createdAt: new Date(),
+      _updatedAt: new Date(),
+    });
+
+    if (!result) {
+      return res.status(500).json({
+        message: "Server Error ",
+      });
+    }
+
+    // Return success if email and password matches
+    await client.close();
+    return res.status(200).json({
+      message: "Student successfully created",
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
+app.post("/create-admin", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("UsersTable");
+
+    const { email, password, name } = req.body;
+
+    if (email === "" || password === "" || name === "") {
+      return res.status(500).json({
+        message: "Server Error ",
+      });
+    }
+
+    const result = await table.insertOne({
+      email,
+      password,
+      name,
+      role: "admin",
       _createdAt: new Date(),
       _updatedAt: new Date(),
     });
