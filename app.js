@@ -245,7 +245,7 @@ app.post("/create-admin", async (req, res) => {
     // Return success if email and password matches
     await client.close();
     return res.status(200).json({
-      message: "Student successfully created",
+      message: "Admin successfully created",
     });
   } catch (error) {
     console.log("error: ", error);
