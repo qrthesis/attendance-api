@@ -151,8 +151,7 @@ app.get("/get-students", async (req, res) => {
         message: "Server error",
       });
     }
-    // Return success if email and password matches
-    await client.close();
+
     return res.status(200).json({
       message: "List of students.",
       students: users.filter((user) => user.role === "student"),
@@ -274,11 +273,21 @@ app.get("/get-admins", async (req, res) => {
         message: "Server error",
       });
     }
+
+    //remove unccessary fields
+    const formattedAdmin = users
+      .filter((user) => user.role === "admin")
+      .map((admin) => {
+        delete admin.password;
+        delete admin._createdAt;
+        delete admin._updatedAt;
+        return admin;
+      });
+
     // Return success if email and password matches
-    await client.close();
     return res.status(200).json({
       message: "List of admin users.",
-      students: users.filter((user) => user.role === "admin"),
+      admins: formattedAdmin,
     });
   } catch (error) {
     console.log("error: ", error);
