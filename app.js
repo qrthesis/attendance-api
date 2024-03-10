@@ -173,7 +173,7 @@ app.post("/create-student", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
-    const { email, password, name } = req.body;
+    const { email, password, name, course } = req.body;
 
     if (email === "" || password === "" || name === "") {
       return res.status(500).json({
@@ -185,6 +185,7 @@ app.post("/create-student", async (req, res) => {
       email,
       password,
       name,
+      course,
       role: "student",
       _createdAt: new Date(),
       _updatedAt: new Date(),
@@ -267,7 +268,6 @@ app.get("/get-admins", async (req, res) => {
     const users = await table.find().toArray();
     await client.close();
 
-    //Return error if email doesn't exist or password didnt match
     if (!users) {
       return res.status(500).json({
         message: "Server error",
