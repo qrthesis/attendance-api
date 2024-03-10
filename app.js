@@ -257,6 +257,39 @@ app.post("/create-admin", async (req, res) => {
   }
 });
 
+app.get("/get-admins", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("UsersTable");
+
+    //Find users based on email
+    const users = await table.find().toArray();
+    await client.close();
+
+    //Return error if email doesn't exist or password didnt match
+    if (!users) {
+      return res.status(500).json({
+        message: "Server error",
+      });
+    }
+    // Return success if email and password matches
+    await client.close();
+    return res.status(200).json({
+      message: "List of admin users.",
+      students: users.filter((user) => user.role === "admin"),
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 app.listen(PORT, (error) => {
   if (!error)
     console.log(
