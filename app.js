@@ -152,9 +152,19 @@ app.get("/get-students", async (req, res) => {
       });
     }
 
+    //remove unccessary fields
+    const formattedStudents = users
+      .filter((user) => user.role === "student")
+      .map((student) => {
+        delete student.password;
+        delete student._createdAt;
+        delete student._updatedAt;
+        return student;
+      });
+
     return res.status(200).json({
       message: "List of students.",
-      students: users.filter((user) => user.role === "student"),
+      students: formattedStudents,
     });
   } catch (error) {
     console.log("error: ", error);
