@@ -145,10 +145,10 @@ app.get("/get-students", async (req, res) => {
     const users = await table.find().toArray();
     await client.close();
 
-    //Return error if email doesn't exist or password didnt match
     if (!users) {
-      return res.status(500).json({
-        message: "Server error",
+      return res.status(200).json({
+        message: "Student users are empty",
+        students: [],
       });
     }
 
@@ -269,8 +269,9 @@ app.get("/get-admins", async (req, res) => {
     await client.close();
 
     if (!users) {
-      return res.status(500).json({
-        message: "Server error",
+      return res.status(200).json({
+        message: "Admin users are empty",
+        admins: [],
       });
     }
 
