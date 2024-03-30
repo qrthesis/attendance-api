@@ -347,6 +347,11 @@ app.post("/reset-password", async (req, res) => {
 
     return res.status(200).json({
       message: "Password successfully updated",
+      user: {
+        ...user,
+        password: newPassword,
+        loginCount: user.loginCount + 1,
+      },
     });
   } catch (error) {
     console.log("error: ", error);
