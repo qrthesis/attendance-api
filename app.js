@@ -1,4 +1,6 @@
 const express = require("express");
+const crypto = require("crypto");
+
 var cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri =
@@ -183,13 +185,15 @@ app.post("/create-student", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
-    const { email, password, name, course } = req.body;
+    const { email, name, course } = req.body;
 
     if (email === "" || password === "" || name === "") {
       return res.status(500).json({
         message: "Server Error ",
       });
     }
+
+    const password = crypto.randomBytes(8).toString("base64").slice(0, 8);
 
     const result = await table.insertOne({
       email,
