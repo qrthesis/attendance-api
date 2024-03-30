@@ -194,9 +194,9 @@ app.post("/create-student", async (req, res) => {
     }
 
     const password = crypto
-      .randomBytes(20)
+      .randomBytes(Math.ceil((20 * 3) / 4))
       .toString("base64")
-      .replace(/\s/g, "")
+      .replace(/[^a-zA-Z0-9]/g, "")
       .slice(0, 8);
 
     const result = await table.insertOne({
