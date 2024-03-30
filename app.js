@@ -193,7 +193,11 @@ app.post("/create-student", async (req, res) => {
       });
     }
 
-    const password = crypto.randomBytes(8).toString("base64").slice(0, 8);
+    const password = crypto
+      .randomBytes(20)
+      .toString("base64")
+      .replace(/\s/g, "")
+      .slice(0, 8);
 
     const result = await table.insertOne({
       email,
