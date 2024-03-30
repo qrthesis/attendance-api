@@ -333,6 +333,7 @@ app.post("/reset-password", async (req, res) => {
     const updateDoc = {
       $set: {
         password: newPassword,
+        loginCount: user.loginCount + 1,
       },
     };
 
