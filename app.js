@@ -194,16 +194,18 @@ app.post("/create-student", async (req, res) => {
     }
 
     const generatedPassword = crypto
-      .randomBytes(Math.ceil((20 * 3) / 4))
-      .toString("base64");
+      .randomBytes(Math.ceil((12 * 3) / 4))
+      .toString("base64")
+      .slice(0, 8)
+      .replace(/[^a-zA-Z0-9]/g, "");
     const decodedPassword = Buffer.from(generatedPassword, "base64")
       .toString()
-      .replace(/[^a-zA-Z0-9]/g, "")
-      .slice(0, 8);
+      .replace(/[^a-zA-Z0-9]/g, "");
+    const encodedPassword = Buffer.from(decodedPassword).toString("base64");
 
     const result = await table.insertOne({
       email,
-      password: decodedPassword,
+      password: encodedPassword,
       name,
       department,
       course,
