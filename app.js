@@ -185,9 +185,9 @@ app.post("/create-student", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
-    const { email, name, course } = req.body;
+    const { email, name, department, course } = req.body;
 
-    if (email === "" || password === "" || name === "") {
+    if (email === "" || name === "") {
       return res.status(500).json({
         message: "Server Error ",
       });
@@ -199,6 +199,7 @@ app.post("/create-student", async (req, res) => {
       email,
       password,
       name,
+      department,
       course,
       role: "student",
       _createdAt: new Date(),
