@@ -310,6 +310,53 @@ app.get("/get-admins", async (req, res) => {
   }
 });
 
+app.post("/reset-password", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const { email, newPassword, oldPassword } = req.body;
+
+    const db = client.db("ThesisData");
+    const table = db.collection("UsersTable");
+
+    //Find users based on email
+    const user = await table.findOne({ email });
+
+    if (user.password !== oldPassword) {
+      return res.status(404).json({
+        message: "Old password doesn't match",
+      });
+    }
+
+    const filter = { email: email };
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        password: newPassword,
+      },
+    };
+
+    const result = await table.updateOne(filter, updateDoc, options);
+
+    if (!result) {
+      return res.status(500).json({
+        message: "Server Error ",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Password successfully updated",
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 app.listen(PORT, (error) => {
   if (!error)
     console.log(
