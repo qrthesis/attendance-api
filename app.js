@@ -158,7 +158,9 @@ app.get("/get-students", async (req, res) => {
     const formattedStudents = users
       .filter((user) => user.role === "student")
       .map((student) => {
-        delete student.password;
+        if (stude.loginCount > 0) {
+          delete student.password;
+        }
         delete student._createdAt;
         delete student._updatedAt;
         return student;
