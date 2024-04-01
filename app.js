@@ -1,5 +1,7 @@
 const express = require("express");
 const crypto = require("crypto");
+const http = require("http");
+const socketIo = require("socket.io");
 
 var cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -8,6 +10,9 @@ const uri =
 
 const app = express();
 const PORT = 3000;
+
+const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(express.json());
 app.use(cors());
@@ -28,6 +33,21 @@ const mongoClientRun = async () => {
   await client.db("admin").command({ ping: 1 });
   console.log("Pinged your deployment. You successfully connected to MongoDB!");
 };
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Handle incoming messages from the client
+  socket.on("message", (data) => {
+    console.log("Received message:", data);
+    // You can emit messages back to the client if needed
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
 
 app.get("/", (req, res) => {
   res.status(200);
@@ -386,7 +406,7 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
-app.listen(PORT, (error) => {
+server.listen(PORT, (error) => {
   if (!error)
     console.log(
       "Server is Successfully Running, and App is listening on port " + PORT
