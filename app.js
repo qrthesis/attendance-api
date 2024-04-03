@@ -419,6 +419,23 @@ app.get("/check", async (req, res) => {
   }
 });
 
+app.post("/save-attendance", async (req, res) => {
+  try {
+    console.log("Request body: ", req.body);
+
+    const { qrData } = req.body;
+    return res.status(200).json({
+      message: "Attendance successfully saved",
+      qrData,
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 server.listen(PORT, (error) => {
   if (!error)
     console.log(
