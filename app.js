@@ -406,6 +406,19 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
+app.get("/check", async (req, res) => {
+  try {
+    return res.status(200).json({
+      message: "Connected to backend server.",
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 server.listen(PORT, (error) => {
   if (!error)
     console.log(
