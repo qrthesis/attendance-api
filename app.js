@@ -2,6 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const http = require("http");
 const socketIo = require("socket.io");
+const dayjs = require("dayjs");
 
 var cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -421,12 +422,58 @@ app.get("/check", async (req, res) => {
 
 app.post("/save-attendance", async (req, res) => {
   try {
-    console.log("Request body: ", req);
+    console.log("Request body: ", req.body);
 
-    // const { qrData } = req.body;
-    return res.status(200).json({
-      message: "Attendance successfully saved",
-      // qrData,
+    await mongoClientRun();
+    const now = new dayjs().unix();
+    console.log(now);
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Attendance");
+
+    const { email, id: eventId } = req.body;
+
+    if (email === "" || eventId === "") {
+      return res.status(500).json({
+        message: "Server Error ",
+      });
+    }
+
+    const user = await table.findOne({ eventId, email });
+
+    if (!user) {
+      const result = await table.insertOne({
+        email,
+        eventId,
+        timeIn: now,
+        timeOut: null,
+      });
+
+      if (result) {
+        return res.status(200).json({
+          message: "Attendance successfully saved",
+        });
+      }
+    }
+
+    const filter = { email: email, eventId: eventId };
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        timeOut: now,
+      },
+    };
+
+    const result = await table.updateOne(filter, updateDoc, options);
+
+    if (result) {
+      return res.status(200).json({
+        message: "Attendance successfully saved",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Server Error ",
     });
   } catch (error) {
     console.log("error: ", error);
