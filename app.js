@@ -421,7 +421,7 @@ app.get("/check", async (req, res) => {
 
 app.post("/save-attendance", async (req, res) => {
   try {
-    console.log("Request body: ", req.body);
+    console.log("Request body: ", req);
 
     // const { qrData } = req.body;
     return res.status(200).json({
