@@ -423,10 +423,10 @@ app.post("/save-attendance", async (req, res) => {
   try {
     console.log("Request body: ", req.body);
 
-    const { qrData } = req.body;
+    // const { qrData } = req.body;
     return res.status(200).json({
       message: "Attendance successfully saved",
-      qrData,
+      // qrData,
     });
   } catch (error) {
     console.log("error: ", error);
