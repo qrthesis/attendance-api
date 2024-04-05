@@ -409,6 +409,7 @@ app.post("/reset-password", async (req, res) => {
 
 app.get("/check", async (req, res) => {
   try {
+    console.log("Checking connection to backend server.");
     return res.status(200).json({
       message: "Connected to backend server.",
     });
