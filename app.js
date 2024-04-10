@@ -98,7 +98,7 @@ app.post("/create-event", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("Events");
 
-    const { eventName, description, date } = req.body;
+    const { eventName, description, date, timeIn, timeOut } = req.body;
 
     if (eventName === "" || description === "" || date === null) {
       return res.status(500).json({
@@ -110,6 +110,8 @@ app.post("/create-event", async (req, res) => {
       name: eventName,
       description,
       date,
+      timeIn,
+      timeOut,
     });
 
     if (!result) {
@@ -478,6 +480,54 @@ app.post("/save-attendance", async (req, res) => {
     });
   } catch (error) {
     console.log("error: ", error);
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
+app.get("/get-attendance", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Attendance");
+    const usersTable = db.collection("UsersTable");
+
+    const { eventId } = req.body;
+
+    //Find users based on email
+    const attendance = await table.find({ eventId }).toArray();
+    const users = await usersTable.find().toArray();
+    await client.close();
+
+    if (!attendance) {
+      return res.status(200).json({
+        message: "Attendance for this event is empty",
+        admins: [],
+      });
+    }
+
+    //remove unccessary fields
+    const formattedAttendance = attendance.map((attend) => {
+      const user = users.find((user) => user.email === attend.email);
+      return {
+        ...attend,
+        name: user.name,
+        department: user.department,
+        course: user.course,
+      };
+    });
+
+    // Return success if email and password matches
+    return res.status(200).json({
+      message: "List of attendance for the event.",
+      attendance: formattedAttendance,
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
     return res.status(500).json({
       message: "Server Error ",
     });
