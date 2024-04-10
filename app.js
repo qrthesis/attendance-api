@@ -496,12 +496,10 @@ app.get("/get-time-in-status", async (req, res) => {
       });
     }
 
-    const studentAttendance = await table
-      .findOne({
-        eventId: eventId,
-        email: email,
-      })
-      .toArray();
+    const studentAttendance = await table.findOne({
+      eventId: eventId,
+      email: email,
+    });
 
     if (!studentAttendance) {
       return res.status(200).json({
