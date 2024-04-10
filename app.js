@@ -5,12 +5,12 @@ const socketIo = require("socket.io");
 const dayjs = require("dayjs");
 const relativeTime = require("dayjs/plugin/relativeTime");
 const localizedFormat = require("dayjs/plugin/localizedFormat");
+const cors = require("cors");
+const { MongoClient, ServerApiVersion, BSON } = require("mongodb");
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
-var cors = require("cors");
-const { MongoClient, ServerApiVersion, BSON } = require("mongodb");
 const uri =
   "mongodb+srv://qrattendancethesis:admin@thesis-cluster.rcibufr.mongodb.net/?retryWrites=true&w=majority&appName=thesis-cluster";
 
