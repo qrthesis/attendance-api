@@ -520,6 +520,55 @@ app.get("/get-time-in-status", async (req, res) => {
   }
 });
 
+app.get("/get-time-out-status", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Attendance");
+    const eventTable = db.collection("Events");
+
+    const { eventId, email } = req.query;
+
+    //Find event based on eventId
+    const event = await eventTable.findOne({
+      _id: BSON.ObjectId.createFromHexString(eventId),
+    });
+
+    const studentAttendance = await table.findOne({
+      eventId: eventId,
+      email: email,
+    });
+
+    if (!studentAttendance) {
+      return res.status(200).json({
+        message: "Student hasn't time in yet",
+      });
+    } else {
+      const now = dayjs();
+      const timeOut = dayjs.unix(event.timeOut);
+
+      const diff = now.diff(timeOut, "minutes");
+
+      if (diff < 0) {
+        return res.status(200).json({
+          message: "Too early to time out",
+        });
+      }
+      return res.status(200).json({
+        message: "Student ready for time out",
+      });
+    }
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 app.get("/check", async (req, res) => {
   try {
     console.log("Checking connection to backend server.");
