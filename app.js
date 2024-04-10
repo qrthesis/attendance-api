@@ -3,9 +3,14 @@ const crypto = require("crypto");
 const http = require("http");
 const socketIo = require("socket.io");
 const dayjs = require("dayjs");
+const relativeTime = require("dayjs/plugin/relativeTime");
+const localizedFormat = require("dayjs/plugin/localizedFormat");
+
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
 
 var cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, BSON } = require("mongodb");
 const uri =
   "mongodb+srv://qrattendancethesis:admin@thesis-cluster.rcibufr.mongodb.net/?retryWrites=true&w=majority&appName=thesis-cluster";
 
@@ -154,6 +159,56 @@ app.get("/get-events", async (req, res) => {
     return res.status(200).json({
       message: "Events successfully fetched",
       data,
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
+app.get("/get-events-per-student", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const { studentId } = req.body;
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Events");
+    const attendanceTable = db.collection("Attendance");
+    const usersTable = db.collection("UsersTable");
+
+    //extract user by student id
+    const student = await usersTable.findOne({ _id: studentId });
+
+    console.log("student: ", student);
+
+    const data = await table.find().toArray();
+
+    //filter out inprogress events
+    const formattedData = data.filter((event) => {
+      return dayjs.unix(event.timeIn).isBefore(dayjs());
+    });
+
+    // formattedData.forEach(async (event) => {
+    //   const attendance = await attendanceTable
+    //     .findOne({
+    //       eventId: event._id,
+    //       email: student.email,
+    //     })
+    //     .toArray();
+
+    //   console.log("data: ", attendance);
+    // });
+
+    await client.close();
+
+    return res.status(200).json({
+      message: "Events successfully fetched",
+      formattedData,
     });
   } catch (error) {
     console.log("error: ", error);
@@ -405,6 +460,58 @@ app.post("/reset-password", async (req, res) => {
         loginCount: user.loginCount + 1,
       },
     });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
+app.get("/get-time-in-status", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Attendance");
+    const eventTable = db.collection("Events");
+
+    const { eventId, email } = req.body;
+
+    //Find users based on email
+    const event = await eventTable.findOne({
+      _id: BSON.ObjectId.createFromHexString(eventId),
+    });
+
+    const now = dayjs();
+    const timeIn = dayjs.unix(event.timeIn);
+
+    const diff = now.diff(timeIn, "minutes");
+
+    if (diff < 0) {
+      return res.status(200).json({
+        message: "Event hasn't started yet",
+      });
+    }
+
+    const studentAttendance = await table
+      .findOne({
+        eventId: eventId,
+        email: email,
+      })
+      .toArray();
+
+    if (!studentAttendance) {
+      return res.status(200).json({
+        message: "Student hasn't time in yet",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Student has time in",
+      });
+    }
   } catch (error) {
     console.log("error: ", error);
     //Return error if can't connect db
