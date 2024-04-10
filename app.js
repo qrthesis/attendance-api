@@ -542,7 +542,7 @@ app.get("/get-time-out-status", async (req, res) => {
 
     if (!studentAttendance) {
       return res.status(200).json({
-        message: "Student hasn't time in yet",
+        message: "Student hasn't time in yet!!",
       });
     } else {
       const now = dayjs();
@@ -552,7 +552,7 @@ app.get("/get-time-out-status", async (req, res) => {
 
       if (diff < 0) {
         return res.status(200).json({
-          message: "Too early to time out",
+          message: "Too early to time out!!",
         });
       }
       return res.status(200).json({
