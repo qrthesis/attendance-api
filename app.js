@@ -478,7 +478,7 @@ app.get("/get-time-in-status", async (req, res) => {
     const table = db.collection("Attendance");
     const eventTable = db.collection("Events");
 
-    const { eventId, email } = req.params;
+    const { eventId, email } = req.query;
 
     //Find users based on email
     const event = await eventTable.findOne({
