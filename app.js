@@ -100,7 +100,13 @@ app.post("/create-event", async (req, res) => {
 
     const { eventName, description, date, timeIn, timeOut } = req.body;
 
-    if (eventName === "" || description === "" || date === null) {
+    if (
+      eventName === "" ||
+      description === "" ||
+      date === null ||
+      timeIn === "" ||
+      timeOut === ""
+    ) {
       return res.status(500).json({
         message: "Server Error ",
       });
