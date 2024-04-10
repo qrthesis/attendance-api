@@ -555,6 +555,13 @@ app.get("/get-time-out-status", async (req, res) => {
           message: "Too early to time out!!",
         });
       }
+
+      if (studentAttendance.timeOut !== null) {
+        return res.status(200).json({
+          message: "Student already timed out",
+        });
+      }
+
       return res.status(200).json({
         message: "Student ready for time out",
       });
