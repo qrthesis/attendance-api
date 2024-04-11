@@ -619,11 +619,15 @@ app.post("/save-attendance", async (req, res) => {
         timeOut: null,
       });
 
-      if (result) {
-        return res.status(200).json({
-          message: "Attendance successfully saved",
+      if (!result) {
+        return res.status(500).json({
+          message: "Error in saving attendance",
         });
       }
+
+      return res.status(200).json({
+        message: "Attendance successfully saved",
+      });
     }
 
     const filter = { email: email, eventId: eventId };
@@ -636,14 +640,13 @@ app.post("/save-attendance", async (req, res) => {
 
     const result = await table.updateOne(filter, updateDoc, options);
 
-    if (result) {
-      return res.status(200).json({
-        message: "Attendance successfully saved",
+    if (!result) {
+      return res.status(500).json({
+        message: "Error in updating table",
       });
     }
-
-    return res.status(500).json({
-      message: "Server Error ",
+    return res.status(200).json({
+      message: "Attendance successfully saved",
     });
   } catch (error) {
     console.log("error: ", error);
