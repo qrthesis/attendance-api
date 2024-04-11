@@ -661,10 +661,16 @@ app.get("/get-attendance", async (req, res) => {
     const table = db.collection("Attendance");
     const usersTable = db.collection("UsersTable");
 
-    const { eventId } = req.body;
+    const { eventId } = req.query;
 
     //Find users based on email
-    const attendance = await table.find({ eventId }).toArray();
+    const attendance = await table
+      .find({
+        eventId,
+      })
+      .toArray();
+
+    console.log("attendance: ", attendance);
     const users = await usersTable.find().toArray();
     await client.close();
 
