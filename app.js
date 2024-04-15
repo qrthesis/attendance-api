@@ -710,6 +710,63 @@ app.get("/get-attendance", async (req, res) => {
   }
 });
 
+app.delete("/delete-event", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Events");
+
+    const { eventId } = req.query;
+
+    const result = await table.deleteOne({
+      _id: BSON.ObjectId.createFromHexString(eventId),
+    });
+
+    if (!result) {
+      return res.status(500).json({
+        message: "Error in deleting event",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Event successfully deleted",
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+})
+
+app.delete("/delete-user", async (req, res) => {
+  try{
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("UsersTable");
+
+    const { userId } = req.query;
+
+    const result = await table.deleteOne({
+      _id: BSON.ObjectId.createFromHexString(userId),
+    });
+
+    if (!result) {
+      return res.status(500).json({
+        message: "Error in deleting user",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User successfully deleted",
+    });
+  } catch (error) {
+
+  }
+})
+
 server.listen(PORT, (error) => {
   if (!error)
     console.log(
