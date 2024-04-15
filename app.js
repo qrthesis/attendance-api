@@ -117,6 +117,14 @@ app.post("/create-event", async (req, res) => {
       });
     }
 
+    const eventWithSameName = await table.findOne({ name: eventName})
+
+    if (eventWithSameName) {
+      return res.status(500).json({
+        message: "Event with same name already exists",
+      });
+    }
+
     const result = await table.insertOne({
       name: eventName,
       description,
@@ -279,6 +287,14 @@ app.post("/create-student", async (req, res) => {
       });
     }
 
+    const userWithEmail = await table.findOne({ email});
+
+    if (userWithEmail) {
+      return res.status(500).json({
+        message: "Email already exists",
+      });
+    }
+
     const generatedPassword = crypto
       .randomBytes(Math.ceil((50 * 3) / 4))
       .toString("base64")
@@ -341,6 +357,14 @@ app.post("/create-admin", async (req, res) => {
     if (email === "" || password === "" || name === "") {
       return res.status(500).json({
         message: "Server Error ",
+      });
+    }
+
+    const userWithEmail = await table.findOne({ email});
+
+    if (userWithEmail) {
+      return res.status(500).json({
+        message: "Email already exists",
       });
     }
 
