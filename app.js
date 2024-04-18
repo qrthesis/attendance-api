@@ -710,6 +710,53 @@ app.get("/get-attendance", async (req, res) => {
   }
 });
 
+app.get("/get-users", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("UsersTable");
+
+    const users = await table.find().toArray();
+    await client.close();
+
+    if (!users) {
+      return res.status(200).json({
+        message: "Users are empty",
+        users: [],
+      });
+    }
+
+    const formattedUsers = users.map((user) => {
+      delete user.password;
+      delete user._createdAt;
+      delete user._updatedAt;
+      return user;
+    });
+
+    const formattedAdmin = formattedUsers.filter(
+      (user) => user.role === "admin"
+    );
+    const formattedStudents = formattedUsers.filter(
+      (user) => user.role === "student"
+    );
+
+    return res.status(200).json({
+      message: "List of users.",
+      users: {
+        admins: formattedAdmin,
+        students: formattedStudents,
+      },
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 server.listen(PORT, (error) => {
   if (!error)
     console.log(
