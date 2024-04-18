@@ -796,7 +796,7 @@ app.get("/get-users", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
-    const { requesterEmail } = req.params;
+    const { requesterEmail } = req.query;
 
     const users = await table.find().toArray();
     await client.close();
