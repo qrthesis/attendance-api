@@ -796,6 +796,8 @@ app.get("/get-users", async (req, res) => {
     const db = client.db("ThesisData");
     const table = db.collection("UsersTable");
 
+    const { requesterEmail } = req.params;
+
     const users = await table.find().toArray();
     await client.close();
 
@@ -814,7 +816,7 @@ app.get("/get-users", async (req, res) => {
     });
 
     const formattedAdmin = formattedUsers.filter(
-      (user) => user.role === "admin"
+      (user) => user.role === "admin" && user.email !== requesterEmail
     );
     const formattedStudents = formattedUsers.filter(
       (user) => user.role === "student"
