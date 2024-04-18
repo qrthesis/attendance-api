@@ -734,6 +734,49 @@ app.get("/get-attendance", async (req, res) => {
   }
 });
 
+app.get("/get-student-attendance", async (req, res) => {
+  try {
+    await mongoClientRun();
+
+    const db = client.db("ThesisData");
+    const table = db.collection("Attendance");
+    const usersTable = db.collection("UsersTable");
+
+    const { eventId, studentEmail } = req.query;
+
+    //Find users based on email
+    const attendance = await table
+      .find({
+        eventId,
+        email: studentEmail,
+      })
+      .toArray();
+
+    console.log("attendance: ", attendance);
+    await client.close();
+
+    if (!attendance) {
+      return res.status(200).json({
+        message: "Attendance for this event is empty",
+        admins: [],
+      });
+    }
+
+    // Return success if email and password matches
+    return res.status(200).json({
+      message: "List of attendance for the event.",
+      attendance,
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    //Return error if can't connect db
+    await client.close();
+    return res.status(500).json({
+      message: "Server Error ",
+    });
+  }
+});
+
 app.delete("/delete-event", async (req, res) => {
   try {
     await mongoClientRun();
